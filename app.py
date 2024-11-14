@@ -4,6 +4,8 @@ import os
 from datetime import datetime, timedelta
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from dotenv import load_dotenv
+from flasgger import swag_from
+from swagger.config import init_swagger
 
 # Load environment variables from .env file
 load_dotenv()
@@ -14,6 +16,9 @@ app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 PORT = int(os.getenv('PORT', 5001))
 jwt = JWTManager(app)
+
+# Initialize Swagger
+init_swagger(app)
 
 GITHUB_API_URL = "https://api.github.com"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
@@ -40,6 +45,7 @@ def home():
 
 @app.route('/github/stats', methods=['GET'])
 @jwt_required()
+@swag_from('swagger/github_stats.yaml')
 def get_github_stats():
     try:
         # Get the current user from the JWT token
